@@ -3,11 +3,21 @@
 #include <iostream>
 #include <new>
 
+enum DoubleListErr
+{
+	outOfBounds,
+	popOnEmpty,
+	invalidIndex
+};
+
 template<class Type>
 class DoubleList
 {
 	Node<Type> * privFirst;
 	Node<Type> * privLast;
+
+	//Var to store list size
+	int privSize;
 
 	//Empty function
 	void privEmpty();
@@ -47,18 +57,18 @@ void DoubleList<Type>::privEmpty()
 		privFirst = aux;
 	}
 	privFirst = privLast = NULL;
+	privSize = 0;
 }
 
 template<class Type>
 Node<Type>* DoubleList<Type>::privGetNodeByPoz(int poz)
 {
-	//TODO throw out of bounds
 	Node<Type> *n = privFirst;
 	int cpoz = 0;
 	while (cpoz < poz)
 	{
 		if (n == NULL)
-			return NULL;
+			throw outOfBounds;
 		n = n->next();
 		cpoz++;
 	}
@@ -68,7 +78,7 @@ Node<Type>* DoubleList<Type>::privGetNodeByPoz(int poz)
 template<class Type>
 Node<Type>* DoubleList<Type>::privGetNodeByValue(const Type & data)
 {
-	//TODO throw node not existing
+	//TODO ask if i should throw node not existing
 	Node<Type> *n = privFirst;
 	while (n->data() != data)
 	{
@@ -83,6 +93,7 @@ template<class Type>
 DoubleList<Type>::DoubleList()
 {
 	privFirst = privLast = NULL;
+	privSize = 0;
 }
 
 template<class Type>
@@ -109,7 +120,8 @@ void DoubleList<Type>::pushFront(const Type & data)
 		n = new Node<Type>(data);
 	}
 	catch (std::bad_alloc & e) {
-		throw e;
+		std::cerr << "Error on allocation of memory!" << std::endl;
+		throw;
 	}
 	//First node in list
 	if (privFirst == NULL)
@@ -121,6 +133,7 @@ void DoubleList<Type>::pushFront(const Type & data)
 	n->next(privFirst);
 	privFirst->prev(n);
 	privFirst = n;
+	privSize++;
 }
 
 template<class Type>
@@ -131,7 +144,8 @@ void DoubleList<Type>::pushBack(const Type & data)
 		n = new Node<Type>(data);
 	}
 	catch (std::bad_alloc & e) {
-		throw e;
+		std::cerr << "Error on allocation of memory!" << std::endl;
+		throw;
 	}
 	//First node in list
 	if (privFirst == NULL)
@@ -141,11 +155,14 @@ void DoubleList<Type>::pushBack(const Type & data)
 	n->prev(privLast);
 	privLast->next(n);
 	privLast = n;
+	privSize++;
 }
 
 template<class Type>
 Type DoubleList<Type>::popFront()
 {
+	if (privFirst == NULL)
+		throw popOnEmpty;
 	//Save the data to return it later
 	Type data = privFirst->data();
 	//Save node to delete later
@@ -155,12 +172,15 @@ Type DoubleList<Type>::popFront()
 	privFirst->prev(NULL);
 	//Delete node and return
 	delete toDel;
+	privSize--;
 	return data;
 }
 
 template<class Type>
 Type DoubleList<Type>::popBack()
 {
+	if (privFirst == NULL)
+		throw popOnEmpty;
 	//Save the data to return it later
 	Type data = privLast->data();
 	//Save node to delete later
@@ -170,30 +190,53 @@ Type DoubleList<Type>::popBack()
 	privLast->next(NULL);
 	//Delete node and return
 	delete toDel;
+	privSize--;
 	return data;
 }
 
 template<class Type>
 void DoubleList<Type>::insert(const Type & data, int poz)
 {
+	//Check for negative poz
+	if (poz < 0)
+		throw invalidIndex;
 	//Insert on pozition 0
 	if (poz == 0)
 	{
-		pushFront(data);
+		try {
+			pushFront(data);
+		}
+		catch (std::bad_alloc e) {
+			throw;
+		}
 		return;
 	}
+	//Check for out of bounds by 2 or more pozitions
+	if (poz > privSize)
+		throw outOfBounds;
 	//Get the node in front of the new node
 	Node<Type> * prev = privGetNodeByPoz(poz - 1);
-	//We are out of the list, insert on last position
-	if (prev == privLast||prev==NULL)
+	//We are inserting on the last position
+	if (prev == privLast)
 	{
-		pushBack(data);
+		try {
+			pushBack(data);
+		}
+		catch (std::bad_alloc e) {
+			throw;
+		}
 	}
 	//Insert on this position
 	else
 	{
 		//Create the node
-		Node<Type> * n = new Node<Type>(data);
+		Node<Type> * n;
+		try {
+			n = new Node<Type>(data);
+		}
+		catch (std::bad_alloc) {
+			throw;
+		}
 		//Get the node next to the added one
 		Node<Type> *next = prev->next();
 
@@ -202,12 +245,15 @@ void DoubleList<Type>::insert(const Type & data, int poz)
 		n->prev(prev);
 		n->next(next);
 		next->prev(n);
+
+		privSize++;
 	}
 }
 
 template<class Type>
 void DoubleList<Type>::remove(const Type & data)
 {
+	//TODO ask about throwing here
 	//get the node by its value
 	Node<Type> * n = privGetNodeByValue(data);
 	//Check if the node exists
@@ -219,21 +265,24 @@ void DoubleList<Type>::remove(const Type & data)
 		privFirst = privFirst->next();
 		privFirst->prev(NULL);
 		delete n;
-		return;
 	}
 	//The node is the last
-	if (n == privLast)
+	else if (n == privLast)
 	{
 		privLast = privLast->prev();
 		privLast->next(NULL);
 		delete n;
-		return;
 	}
-
 	//The node has a prev and a next
-	n->prev()->next(n->next());
-	n->next()->prev(n->prev());
-	delete n;
+	else
+	{
+		
+		n->prev()->next(n->next());
+		n->next()->prev(n->prev());
+		delete n;
+	}
+	privSize--;
+	
 }
 
 template<class Type>
@@ -242,8 +291,22 @@ DoubleList<Type>& DoubleList<Type>::operator=(DoubleList<Type>& dl)
 	//empty list first
 	privEmpty();
 
-	//TODO use pushBack()
+	//Push back method
+	Node<Type> * n = dl.privFirst;
+	while (n != NULL)
+	{
+		try {
+			pushBack(n->data());
+		}
+		catch (std::bad_alloc e){
+			throw;
+		}
+		
+		n = n->next();
+	}
 
+	/* Faster method but more code
+	
 	Node<Type> * aux = dl.privFirst;
 	Node<Type> * prev = NULL;
 	Node<Type> * n = NULL;
@@ -268,15 +331,17 @@ DoubleList<Type>& DoubleList<Type>::operator=(DoubleList<Type>& dl)
 	}
 	n->next(NULL);
 	privLast = n;
+	*/
 
 	return *this;
 }
 
 template<class Type>
-Type DoubleList<Type>::operator[](const int i)
+Type DoubleList<Type>::operator[](const int poz)
 {
-	Node<Type> *n = privGetNodeByPoz(i);
-	if (n == NULL)
-		return NULL;
+	if (poz > privSize - 1)
+		throw outOfBounds;
+	//Get node
+	Node<Type> *n = privGetNodeByPoz(poz);
 	return n->data();
 }

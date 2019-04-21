@@ -12,7 +12,7 @@ int main()
 	dl.pushBack(6);
 	dl.insert(3, 2);
 	dl.insert(7, 6);
-	dl.insert(8, 12);
+	dl.insert(8, 7);
 	for (int i = 0; i < 8; i++)
 	{
 		std::cout << dl[i] << " ";
