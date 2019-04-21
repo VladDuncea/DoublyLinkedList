@@ -1,0 +1,41 @@
+PR 2. 
+implementati clasa template lista (sa mearga pentru toate tipurile de date) pornind de la:
+// lista dublu inlantuita
+
+template<class T>
+class Lista
+{
+private:
+
+	Nod<T> * prim; // trebuie facut si clasa nod
+	Nod<T> * ultim;
+};
+
+trebuie sa mai adaugati: 
+x -> constructor simplu	
+-> constructor cu parametri (ex: sa creeze o lista de i elemente cu valoarea x)
+x -> destructor
+x -> constructor de copiere
+x -> operator = 
+
+operatii de implementat pe o lista 
+x -> push_front (adauga la inceput)
+x -> push_back (adauga un element la finalul listei)
+x -> pop_back (sterge ultimul element)
+x -> pop_front (sterge primul element)
+x -> insert (adauga un element pe o pozitie)
+x -> remove (sterge un element)
+
+operatori de implementat pe o lista:
+x -> operator []  -> intoarce valoarea de la pozitia i ex: l[i];
+-> operator de conversie la bool, sa pot scrie 
+		if (l) -> adica daca v are elemente
+-> operator de conversie la int, sa returneze size-ul listei
+
+-> sa se implementeze pentru clasa lista iteratori care sa supraincarce
+	-> operator ++ prefixat si postfixat
+	-> operator * (*it) si -> (it->)
+	-> operator == si !=
+
+-> aruncati si tratati exceptii 
+
