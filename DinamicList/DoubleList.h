@@ -26,8 +26,9 @@ class DoubleList
 	Node<Type> * privGetNodeByValue(const Type & data);
 
 public:
-	
+	//Constructors
 	DoubleList();
+	DoubleList(int nr, Type val);
 	//Copy constructor
 	DoubleList(DoubleList<Type> &dl);
 
@@ -41,10 +42,15 @@ public:
 
 	void insert(const Type & data,int poz);
 	void remove(const Type & data);
+	
+	//List info
+	int size() const;
 
 	//Operator
 	DoubleList<Type> & operator=(DoubleList<Type> & dl);
 	Type operator[](const int i);
+	operator bool() const;
+	operator int() const;
 };
 
 template<class Type>
@@ -78,15 +84,18 @@ Node<Type>* DoubleList<Type>::privGetNodeByPoz(int poz)
 template<class Type>
 Node<Type>* DoubleList<Type>::privGetNodeByValue(const Type & data)
 {
+	//Empty list
+	if (privFirst == NULL)
+		return NULL;
 	//TODO ask if i should throw node not existing
 	Node<Type> *n = privFirst;
-	while (n->data() != data)
+	while (n)
 	{
-		if (n == NULL)
-			return NULL;
+		if (n->data() == data)
+			return n;
 		n = n->next();
 	}
-	return n;
+	return NULL;
 }
 
 template<class Type>
@@ -94,6 +103,13 @@ DoubleList<Type>::DoubleList()
 {
 	privFirst = privLast = NULL;
 	privSize = 0;
+}
+
+template<class Type>
+DoubleList<Type>::DoubleList(int nr, Type val)
+{
+	for (int i = 0; i < nr; i++)
+		pushBack(val);
 }
 
 template<class Type>
@@ -169,7 +185,11 @@ Type DoubleList<Type>::popFront()
 	Node<Type> * toDel = privFirst;
 	//Set next node as new front
 	privFirst = privFirst->next();
-	privFirst->prev(NULL);
+	//Check for empty list
+	if (privFirst != NULL)
+		privFirst->prev(NULL);
+	else
+		privLast = NULL;
 	//Delete node and return
 	delete toDel;
 	privSize--;
@@ -187,7 +207,11 @@ Type DoubleList<Type>::popBack()
 	Node<Type> * toDel = privLast;
 	//Set next node as new front
 	privLast = privLast->prev();
-	privLast->next(NULL);
+	//Check for empty list
+	if (privLast != NULL)
+		privLast->next(NULL);
+	else
+		privFirst = NULL;
 	//Delete node and return
 	delete toDel;
 	privSize--;
@@ -262,16 +286,12 @@ void DoubleList<Type>::remove(const Type & data)
 	//The node is the first
 	if (n == privFirst)
 	{
-		privFirst = privFirst->next();
-		privFirst->prev(NULL);
-		delete n;
+		popFront();
 	}
 	//The node is the last
 	else if (n == privLast)
 	{
-		privLast = privLast->prev();
-		privLast->next(NULL);
-		delete n;
+		popBack();
 	}
 	//The node has a prev and a next
 	else
@@ -279,10 +299,15 @@ void DoubleList<Type>::remove(const Type & data)
 		
 		n->prev()->next(n->next());
 		n->next()->prev(n->prev());
+		privSize--;
 		delete n;
 	}
-	privSize--;
-	
+}
+
+template<class Type>
+int DoubleList<Type>::size() const
+{
+	return privSize;
 }
 
 template<class Type>
@@ -345,3 +370,16 @@ Type DoubleList<Type>::operator[](const int poz)
 	Node<Type> *n = privGetNodeByPoz(poz);
 	return n->data();
 }
+
+template<class Type>
+DoubleList<Type>::operator bool() const
+{
+	return privSize > 0;
+}
+
+template<class Type>
+DoubleList<Type>::operator int() const
+{
+	return privSize;
+}
+

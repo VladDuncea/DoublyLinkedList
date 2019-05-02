@@ -13,7 +13,7 @@ private:
 
 trebuie sa mai adaugati: 
 x -> constructor simplu	
--> constructor cu parametri (ex: sa creeze o lista de i elemente cu valoarea x)
+x -> constructor cu parametri (ex: sa creeze o lista de i elemente cu valoarea x)
 x -> destructor
 x -> constructor de copiere
 x -> operator = 
@@ -28,7 +28,7 @@ x -> remove (sterge un element)
 
 operatori de implementat pe o lista:
 x -> operator []  -> intoarce valoarea de la pozitia i ex: l[i];
--> operator de conversie la bool, sa pot scrie 
+x-> operator de conversie la bool, sa pot scrie 
 		if (l) -> adica daca v are elemente
 -> operator de conversie la int, sa returneze size-ul listei
 
