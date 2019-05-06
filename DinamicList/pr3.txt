@@ -1,0 +1,106 @@
+//#include "pch.h"
+//#include <iostream>
+
+/*
+iteratorii sunt folositi pentru a parcurge elementele dintr-o lista / dintr-un vector
+*/
+
+class vector
+{
+public:
+    class iterator
+    {
+    public:
+        iterator(int * el) : element(el) {};
+
+        // voi faceti element privat si implementati ++ pentru a muta iteratorul mai la stanga
+        // implementati == si != pentru a compara doi iteratori
+        // implementati operatorul * pentru a accesa elementul din vector (sa puteti scrie *it in loc de *it.element)
+        int * element;
+    };
+
+    // orice clasa care implementeaza iteratori are o metoda begin, care intoarce un iterator la primul element
+    iterator begin() { return iterator(a); } 
+
+    // si o metoda end, care intoarce un iterator catre elementul de dupa ultimul element
+    iterator end() { return iterator(a + size); }
+
+    void push_back(int x) { a[size++] = x; }
+private:
+    int a[100];
+    int size = 0;
+};
+
+// similar se implementeaza pentru o lista 
+class lista
+{
+public:
+    class iterator;
+private:
+    // clasa nod puteti sa o lasati privata in interiorul listei
+    class nod 
+    {
+        friend lista;
+        friend iterator;
+    public:
+        nod(int info, nod * next = nullptr): info(info), next(next) {}
+        int get_info() { return info; }
+    private:
+        int info;
+        nod * next;
+    };
+
+    nod * prim = nullptr;
+public:
+    class iterator
+    {
+    public:
+        iterator(nod * current): current(current) {};
+        void increment() { current = current->next; }
+        nod * current;
+    };
+
+    void push_front(int x)
+    {
+        if (!prim)
+            prim = new nod(x);
+        else
+        {
+            nod * aux = new nod(x, prim);
+            prim = aux;
+        }
+    };
+
+    iterator begin() { return iterator(prim); };
+    iterator end() { return iterator(nullptr); }    
+};
+
+int main()
+{
+    vector ob;
+    ob.push_back(2);
+    ob.push_back(3);
+    ob.push_back(4);
+    ob.push_back(7);
+    ob.push_back(6);
+
+    // parcurgem vectorul folosind un iterator care merge de la begin la end
+    std::cout << "Parcurgere vector: " << std::endl;
+    for (vector::iterator b = ob.begin(); b.element != ob.end().element; ++ b.element)
+    {
+        std::cout << *b.element << std::endl;
+    }
+
+    lista l;
+    l.push_front(5);
+    l.push_front(2);
+    l.push_front(6);
+    l.push_front(3);
+
+    std::cout << "\nParcurgere lista: " << std::endl;
+    for (lista::iterator b = l.begin(); b.current != l.end().current; b.increment())
+    {
+        std::cout << b.current->get_info() << std::endl;
+    }
+    return 0;
+}

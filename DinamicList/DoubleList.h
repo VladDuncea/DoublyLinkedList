@@ -51,6 +51,82 @@ public:
 	Type operator[](const int i);
 	operator bool() const;
 	operator int() const;
+
+	//Iterator
+	class iterator
+	{
+		Node<Type>* itr;
+	public:
+		
+		//Construcotr
+		iterator(Node<Type>* current) : itr(current) {};
+		//Increment function
+		void increment() { itr = itr->next; }
+
+		//operators
+
+		//Increment 
+		iterator& operator++()
+		{
+			if (itr!= NULL)
+				itr = itr->next();
+			else
+				throw outOfBounds;
+			return *this;
+		}
+		iterator& operator++(int x)
+		{
+			if (itr != NULL)
+				itr = itr->next();
+			else
+				throw outOfBounds;
+			return *this;
+		}
+
+		//Decrement
+		iterator& operator--()
+		{
+			if(itr!=NULL)
+				itr = itr->prev();
+			else
+				throw outOfBounds;
+			return *this;
+		}
+		iterator& operator--(int x)
+		{
+			if (itr != NULL)
+				itr = itr->prev();
+			else
+				throw outOfBounds;
+			return *this;
+		}
+
+		//Boolean operators
+		bool operator== (const iterator& cmp) const
+		{
+			return itr == cmp.itr;
+
+		}
+		bool operator!= (const iterator& cmp) const
+		{
+			return itr != cmp.itr;
+
+		}
+
+		Type operator*() const
+		{
+			return itr->data();
+		}
+
+		Node<Type>* operator->() const
+		{
+			return itr;
+		}
+	};
+
+	iterator begin() { return iterator(privFirst); };
+	iterator end() { return iterator(NULL); };
+
 };
 
 template<class Type>

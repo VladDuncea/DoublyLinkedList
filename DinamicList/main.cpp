@@ -25,6 +25,11 @@ int main()
 		cout << dl[i] << " ";
 	}
 	cout << endl;
+
+	DoubleList<int>::iterator it=dl.begin();
+	cout << *it;
+
+	cout << endl;
 	for (int i = 0; i < 8; i++)
 	{
 		dl.remove((int)dl-1);
