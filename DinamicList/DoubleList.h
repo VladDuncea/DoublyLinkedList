@@ -442,6 +442,8 @@ Type DoubleList<Type>::operator[](const int poz)
 {
 	if (poz > privSize - 1)
 		throw outOfBounds;
+	if (poz < 0)
+		throw invalidIndex;
 	//Get node
 	Node<Type> *n = privGetNodeByPoz(poz);
 	return n->data();
