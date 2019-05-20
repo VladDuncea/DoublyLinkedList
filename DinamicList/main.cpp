@@ -2,6 +2,24 @@
 #include "DoubleList.h"
 
 using namespace std;
+
+class A
+{
+public:
+	int m_x, m_y;
+
+	A(int x = 0, int y = 0)
+	{
+		m_x = x;
+		m_y = y;
+	}
+	void afis()
+	{
+		cout << m_x << " " << m_y << "\n";
+	}
+};
+
+
 int main()
 {
 	DoubleList<int> dl;
@@ -34,5 +52,19 @@ int main()
 	{
 		dl.remove((int)dl-1);
 	}
+
+	cout << endl << endl;
+	DoubleList<A> dla;
+ 	dla.pushFront(A());
+	dla.pushBack(A(1, 7));
+	dla[0].afis();
+	dla[0].m_x = 7;
+	dla[0].afis();
+	DoubleList<A>::iterator ita = dla.begin();
+	ita->afis();
+	ita++;
+	ita->afis();
+	(*ita).m_x = 5;
+	ita->afis();
 	return 0;
 }

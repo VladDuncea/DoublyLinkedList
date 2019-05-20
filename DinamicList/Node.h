@@ -23,6 +23,8 @@ public:
 
 	//Getter function for data
 	Type data() const;
+	Type& data_ref();
+
 	//Setter function for data
 	void data(Type x);
 };
@@ -71,6 +73,12 @@ void Node<Type>::prev(Node<Type>* n)
 
 template<class Type>
 Type Node<Type>::data() const
+{
+	return privData;
+}
+
+template<class Type>
+Type& Node<Type>::data_ref()
 {
 	return privData;
 }

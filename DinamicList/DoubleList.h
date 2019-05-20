@@ -48,7 +48,7 @@ public:
 
 	//Operator
 	DoubleList<Type> & operator=(DoubleList<Type> & dl);
-	Type operator[](const int i);
+	Type& operator[](const int i);
 	operator bool() const;
 	operator int() const;
 
@@ -66,7 +66,7 @@ public:
 		//operators
 
 		//Increment 
-		iterator& operator++()
+		iterator operator++()
 		{
 			if (itr!= NULL)
 				itr = itr->next();
@@ -74,31 +74,14 @@ public:
 				throw outOfBounds;
 			return *this;
 		}
-		iterator& operator++(int x)
+		iterator operator++(int x)
 		{
+			iterator aux =*this;
 			if (itr != NULL)
 				itr = itr->next();
 			else
 				throw outOfBounds;
-			return *this;
-		}
-
-		//Decrement
-		iterator& operator--()
-		{
-			if(itr!=NULL)
-				itr = itr->prev();
-			else
-				throw outOfBounds;
-			return *this;
-		}
-		iterator& operator--(int x)
-		{
-			if (itr != NULL)
-				itr = itr->prev();
-			else
-				throw outOfBounds;
-			return *this;
+			return aux;
 		}
 
 		//Boolean operators
@@ -113,14 +96,14 @@ public:
 
 		}
 
-		Type operator*() const
+		Type& operator*() const
 		{
-			return itr->data();
+			return itr->data_ref();
 		}
 
-		Node<Type>* operator->() const
+		Type* operator->() const
 		{
-			return itr;
+			return &(itr->data_ref());
 		}
 	};
 
@@ -211,7 +194,7 @@ void DoubleList<Type>::pushFront(const Type & data)
 	try {
 		n = new Node<Type>(data);
 	}
-	catch (std::bad_alloc & e) {
+	catch (std::bad_alloc) {
 		std::cerr << "Error on allocation of memory!" << std::endl;
 		throw;
 	}
@@ -235,7 +218,7 @@ void DoubleList<Type>::pushBack(const Type & data)
 	try {
 		n = new Node<Type>(data);
 	}
-	catch (std::bad_alloc & e) {
+	catch (std::bad_alloc) {
 		std::cerr << "Error on allocation of memory!" << std::endl;
 		throw;
 	}
@@ -389,6 +372,8 @@ int DoubleList<Type>::size() const
 template<class Type>
 DoubleList<Type>& DoubleList<Type>::operator=(DoubleList<Type>& dl)
 {
+	if (this == &dl)
+		return *this;
 	//empty list first
 	privEmpty();
 
@@ -438,15 +423,15 @@ DoubleList<Type>& DoubleList<Type>::operator=(DoubleList<Type>& dl)
 }
 
 template<class Type>
-Type DoubleList<Type>::operator[](const int poz)
+Type& DoubleList<Type>::operator[](const int poz)
 {
-	if (poz > privSize - 1)
+	if (poz >= privSize)
 		throw outOfBounds;
 	if (poz < 0)
 		throw invalidIndex;
 	//Get node
 	Node<Type> *n = privGetNodeByPoz(poz);
-	return n->data();
+	return n->data_ref();
 }
 
 template<class Type>
